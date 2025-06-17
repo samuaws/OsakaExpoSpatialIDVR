@@ -1,0 +1,12 @@
+# ninja log v5
+244	490	7717909644242264	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	19866b421056ca44
+492	1025	7717909649489206	C:/Users/Samua/Desktop/Unity Projects/MarkerDetector/QuestArUcoMarkerTracking-main/QuestMarkerTracking/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/495dm1h2/obj/arm64-v8a/libswappywrapper.so	1ff792aca0d1000b
+91	1417	7717909653480922	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	aa41a2d92b079395
+116	1465	7717909653970865	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	45ad4ef554388449
+69	1523	7717909654569273	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	33d3a56503e3a2c2
+218	1569	7717909654991730	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	8eb4a40fcf00e0d7
+37	1649	7717909655843105	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	6a120390e40204f9
+182	1775	7717909656984897	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	55f6b644e5154393
+1	1901	7717909658301769	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	a711674dc814bf52
+142	1980	7717909659136599	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	ad53135af3451f88
+1980	2290	7717909662209472	C:/Users/Samua/Desktop/Unity Projects/MarkerDetector/QuestArUcoMarkerTracking-main/QuestMarkerTracking/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/495dm1h2/obj/arm64-v8a/libgame.so	49fe5d271ce16e2d

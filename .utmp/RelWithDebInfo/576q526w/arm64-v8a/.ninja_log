@@ -1,0 +1,12 @@
+# ninja log v5
+166	402	7718725524296767	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	8201c4801a6ee975
+405	798	7718725528078727	C:/Users/Samua/Documents/GitHub/OsakaExpoSpatialIDVR/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/576q526w/obj/arm64-v8a/libswappywrapper.so	eddfcc5341e56350
+78	1342	7718725533632523	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	910d1b6634512d82
+70	1368	7718725533867447	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	b7891cbb4949d1cd
+42	1379	7718725534014092	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	5ed1f9441561e380
+140	1409	7718725534321633	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	dffb90151d0a9f70
+20	1440	7718725534619866	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	35a39bd6fa04558e
+131	1557	7718725535795823	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	75f955c6f5063ff1
+104	1622	7718725536448930	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	f31aeeb95d7c09cf
+0	1725	7718725537455329	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	263513cacbea186b
+1725	2028	7718725540419279	C:/Users/Samua/Documents/GitHub/OsakaExpoSpatialIDVR/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/576q526w/obj/arm64-v8a/libgame.so	ecdb093112bcb2d2
