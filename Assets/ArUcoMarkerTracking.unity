@@ -1304,6 +1304,77 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 266265271}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &288395469
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 288395472}
+  - component: {fileID: 288395471}
+  - component: {fileID: 288395470}
+  m_Layer: 0
+  m_Name: CesiumGeoreference
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &288395470
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 288395469}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be1fb41cdd01d7649a082f1a8f2bd114, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _useMainCamera: 1
+  _useSceneViewCameraInEditor: 1
+  _additionalCameras: []
+--- !u!114 &288395471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 288395469}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1305e05d46db92498ce698a4c366a5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _ellipsoidOverride: {fileID: 0}
+  _originPlacement: 1
+  _originAuthority: 0
+  _latitude: 39.736401
+  _longitude: -105.25737
+  _height: 2250
+  _ecefX: -1292934.4950404565
+  _ecefY: -4740026.104285267
+  _ecefZ: 4056960.1513377777
+  _scale: 1
+--- !u!4 &288395472
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 288395469}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1506689847}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &304015363
 GameObject:
   m_ObjectHideFlags: 0
@@ -1640,6 +1711,8 @@ GameObject:
   m_Component:
   - component: {fileID: 358949062}
   - component: {fileID: 358949061}
+  - component: {fileID: 358949063}
+  - component: {fileID: 358949064}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -1676,6 +1749,42 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &358949063
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 358949060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a95a50b1c85931844970f0d25f9d69b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  aprilTag: {fileID: 0}
+  cameraTransform: {fileID: 0}
+  geoRef: {fileID: 0}
+  tagLongitude: 139
+  tagLatitude: 35
+  tagHeight: 14
+  tagYawDeg: 100
+--- !u!114 &358949064
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 358949060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 678389421af66d742848dde5c8a79143, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  geoReference: {fileID: 288395471}
+  longitude: 139.7528
+  latitude: 35.6852
+  height: 20
+  aprilTagTransform: {fileID: 0}
 --- !u!1 &363842719
 GameObject:
   m_ObjectHideFlags: 0
@@ -8730,7 +8839,15 @@ MonoBehaviour:
   resetHmdPoseOnRelease: 1
   resetHmdPoseByMiddleMouseButton: 1
   activateKeys: 3201000031010000
+  activateKeyBindings:
+  - <Keyboard>/leftCtrl
+  - <Keyboard>/rightCtrl
+  - <Keyboard>/f1
   pitchKeys: 3401000033010000
+  pitchKeyBindings:
+  - <Keyboard>/leftAlt
+  - <Keyboard>/rightAlt
+  - <Keyboard>/f2
 --- !u!114 &1441500613
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9157,6 +9274,79 @@ Transform:
   m_Children: []
   m_Father: {fileID: 465275108}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1506689846
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1506689847}
+  - component: {fileID: 1506689848}
+  m_Layer: 0
+  m_Name: Google Photorealistic 3D Tiles
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1506689847
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1506689846}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 288395472}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1506689848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1506689846}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 844ac86b07dcfa3468f56da55d787510, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _showCreditsOnScreen: 0
+  _tilesetSource: 0
+  _url: 
+  _ionAssetID: 3435573
+  _ionAccessToken: 
+  _ionServer: {fileID: 11400000, guid: 9f6eac1a5e88e32469daa0e237e54017, type: 2}
+  _maximumScreenSpaceError: 16
+  _preloadAncestors: 1
+  _preloadSiblings: 1
+  _forbidHoles: 0
+  _maximumSimultaneousTileLoads: 20
+  _maximumCachedBytes: 536870912
+  _loadingDescendantLimit: 20
+  _enableFrustumCulling: 1
+  _enableFogCulling: 1
+  _enforceCulledScreenSpaceError: 1
+  _culledScreenSpaceError: 64
+  _opaqueMaterial: {fileID: 0}
+  _generateSmoothNormals: 0
+  _pointCloudShading:
+    _attenuation: 0
+    _geometricErrorScale: 1
+    _maximumAttenuation: 0
+    _baseResolution: 0
+  _suspendUpdate: 0
+  _showTilesInHierarchy: 0
+  _updateInEditor: 1
+  _logSelectionStats: 0
+  _createPhysicsMeshes: 1
 --- !u!1 &1518489273
 GameObject:
   m_ObjectHideFlags: 0
@@ -12746,3 +12936,4 @@ SceneRoots:
   - {fileID: 1723155234}
   - {fileID: 546589276}
   - {fileID: 358949062}
+  - {fileID: 288395472}
