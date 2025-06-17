@@ -1734,6 +1734,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   arucoCoordinator: {fileID: 336067257}
   unityPosText: {fileID: 1158783914}
+  aprilTagGeoreferenceAligner: {fileID: 358949064}
 --- !u!4 &358949062
 Transform:
   m_ObjectHideFlags: 0
@@ -1761,9 +1762,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a95a50b1c85931844970f0d25f9d69b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  aprilTag: {fileID: 0}
-  cameraTransform: {fileID: 0}
-  geoRef: {fileID: 0}
+  geoRef: {fileID: 288395471}
+  ovrRig: {fileID: 1441500614}
   tagLongitude: 139
   tagLatitude: 35
   tagHeight: 14
@@ -1784,7 +1784,6 @@ MonoBehaviour:
   longitude: 139.7528
   latitude: 35.6852
   height: 20
-  aprilTagTransform: {fileID: 0}
 --- !u!1 &363842719
 GameObject:
   m_ObjectHideFlags: 0

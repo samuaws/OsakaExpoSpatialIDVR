@@ -3,6 +3,7 @@ using UnityEngine;
 using TryAR.MarkerTracking;
 using TMPro;
 
+
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
@@ -10,26 +11,11 @@ public class GameManager : MonoBehaviour
     [Header("Reference to the ArUco Tracking Coordinator")]
     public ArUcoTrackingAppCoordinator arucoCoordinator;
     public TextMeshProUGUI unityPosText;
+    public AprilTagGeoreferenceAligner aprilTagGeoreferenceAligner;
 
     private bool aButtonWasPressed = false;
 
-    // Struct to store position and rotation
-    public struct TagUnityPose
-    {
-        public Vector3 position;
-        public Quaternion rotation;
-
-        public TagUnityPose(Vector3 pos, Quaternion rot)
-        {
-            position = pos;
-            rotation = rot;
-        }
-
-        public override string ToString()
-        {
-            return $"Position: {position}, Rotation (Euler): {rotation.eulerAngles}";
-        }
-    }
+   
 
     private TagUnityPose savedTagPose;
 
@@ -89,6 +75,7 @@ public class GameManager : MonoBehaviour
                     unityPosText.text = savedTagPose.ToString();
                     if(trackedObj.TryGetComponent<OVRSpatialAnchor>(out OVRSpatialAnchor comp)) Destroy(comp);
                     trackedObj.AddComponent<OVRSpatialAnchor>();
+                    aprilTagGeoreferenceAligner.AlignCesiumToAprilTag(savedTagPose);
                 }
                 else
                 {
@@ -113,5 +100,23 @@ public class GameManager : MonoBehaviour
     public TagUnityPose GetSavedTagPose()
     {
         return savedTagPose;
+    }
+}
+
+// Struct to store position and rotation
+public struct TagUnityPose
+{
+    public Vector3 position;
+    public Quaternion rotation;
+
+    public TagUnityPose(Vector3 pos, Quaternion rot)
+    {
+        position = pos;
+        rotation = rot;
+    }
+
+    public override string ToString()
+    {
+        return $"Position: {position}, Rotation (Euler): {rotation.eulerAngles}";
     }
 }

@@ -16,41 +16,39 @@ public class AprilTagGeoreferenceAligner : MonoBehaviour
     [Tooltip("Height in meters above WGS84 ellipsoid")]
     public double height = 20.0;
 
-    [Header("AprilTag GameObject in Unity")]
-    public Transform aprilTagTransform;
-
     void Start()
     {
-        if (geoReference == null || aprilTagTransform == null)
+        if (geoReference == null)
         {
-            Debug.LogError("Please assign both geoReference and aprilTagTransform in the Inspector.");
+            Debug.LogError("CesiumGeoreference is not assigned.");
             return;
         }
 
-        AlignCesiumToAprilTag();
+        TagUnityPose tagPose = GameManager.Instance.GetSavedTagPose();
+       // AlignCesiumToAprilTag(tagPose);
     }
 
-    void AlignCesiumToAprilTag()
+    public void AlignCesiumToAprilTag(TagUnityPose tagPose)
     {
-        // 1. Convert geodetic coordinates (lon, lat, height) to ECEF
+        // 1. Convert geodetic coordinates to ECEF
         double3 ecef = CesiumWgs84Ellipsoid.LongitudeLatitudeHeightToEarthCenteredEarthFixed(
             new double3(longitude, latitude, height)
         );
 
-        // 2. Convert ECEF to Unity world position (Relative to Cesium origin)
+        // 2. Convert ECEF to Unity coordinates
         double3 unityDoublePos = geoReference.TransformEarthCenteredEarthFixedPositionToUnity(ecef);
 
-        // 3. Cast double3 to Vector3
+        // 3. Convert to Vector3
         Vector3 cesiumUnityPos = new Vector3(
             (float)unityDoublePos.x,
             (float)unityDoublePos.y,
             (float)unityDoublePos.z
         );
 
-        // 4. Compute offset between detected AprilTag position and Cesium's computed position
-        Vector3 offset = aprilTagTransform.position - cesiumUnityPos;
+        // 4. Calculate offset between AprilTag pose and Cesium reference position
+        Vector3 offset = tagPose.position - cesiumUnityPos;
 
-        // 5. Apply the offset to the Cesium Georeference GameObject
+        // 5. Apply the offset to Cesium's origin
         geoReference.transform.position += offset;
 
         Debug.Log($" Cesium aligned to AprilTag. Offset: {offset}");
