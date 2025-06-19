@@ -407,6 +407,7 @@ namespace TryAR.MarkerTracking
             DICT_7X7_250 = Objdetect.DICT_7X7_250,
             DICT_7X7_1000 = Objdetect.DICT_7X7_1000,
             DICT_ARUCO_ORIGINAL = Objdetect.DICT_ARUCO_ORIGINAL,
+            DICT_ARUCO_APRIL = Objdetect.DICT_APRILTAG_36h11,
         }
     }
 }

@@ -25,32 +25,23 @@ public class AprilTagGeoreferenceAligner : MonoBehaviour
         }
 
         TagUnityPose tagPose = GameManager.Instance.GetSavedTagPose();
-       // AlignCesiumToAprilTag(tagPose);
+        AlignCesiumToAprilTag(tagPose);
     }
 
     public void AlignCesiumToAprilTag(TagUnityPose tagPose)
     {
-        // 1. Convert geodetic coordinates to ECEF
+        // 1. Convert LLH to ECEF
         double3 ecef = CesiumWgs84Ellipsoid.LongitudeLatitudeHeightToEarthCenteredEarthFixed(
             new double3(longitude, latitude, height)
         );
 
-        // 2. Convert ECEF to Unity coordinates
-        double3 unityDoublePos = geoReference.TransformEarthCenteredEarthFixedPositionToUnity(ecef);
+        // 2. Set Cesium origin at LLH location
+        geoReference.SetOriginLongitudeLatitudeHeight(longitude, latitude, height);
 
-        // 3. Convert to Vector3
-        Vector3 cesiumUnityPos = new Vector3(
-            (float)unityDoublePos.x,
-            (float)unityDoublePos.y,
-            (float)unityDoublePos.z
-        );
+        // 3. Place the Unity origin (0,0,0) at the AprilTag pose
+        geoReference.transform.position = tagPose.position;
+        geoReference.transform.rotation = tagPose.rotation;
 
-        // 4. Calculate offset between AprilTag pose and Cesium reference position
-        Vector3 offset = tagPose.position - cesiumUnityPos;
-
-        // 5. Apply the offset to Cesium's origin
-        geoReference.transform.position += offset;
-
-        Debug.Log($" Cesium aligned to AprilTag. Offset: {offset}");
+        Debug.Log($"Cesium georeference aligned to AprilTag pose at {tagPose.position}");
     }
 }
