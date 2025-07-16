@@ -1,9 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Mathematics;
 using TMPro;
 using CesiumForUnity;
+using UnityEngine.UI;
+using UnityEngine.InputSystem; // New Input System
 
 public class SpatialIdVisualizer : MonoBehaviour
 {
@@ -13,11 +15,24 @@ public class SpatialIdVisualizer : MonoBehaviour
     public GameObject labelPrefab;
     public TextMeshProUGUI distanceText;
 
+    [Header("UI Sliders")]
+    public Slider offsetXSlider;
+    public Slider offsetYSlider;
+    public Slider offsetZSlider;
+
     [Header("Zoom Filtering")]
     public int targetZoomLevel = 27;
 
     private Transform referencePoint;
     private List<GameObject> cubes = new List<GameObject>();
+
+    // Controller-based slider selection
+    private enum OffsetSliderTarget { X, Y, Z }
+    private OffsetSliderTarget selectedSlider = OffsetSliderTarget.X;
+    private float sliderStep = 0.01f;
+    private float stickDeadZone = 0.2f;
+    private float sliderCooldown = 0.2f;
+    private float lastSwitchTime = 0f;
 
     void Start()
     {
@@ -31,7 +46,16 @@ public class SpatialIdVisualizer : MonoBehaviour
         if (geoReference == null || NoderedConnector.detections == null)
             return;
 
-        // Clear previous cubes
+        // Handle controller input for sliders
+        HandleSliderControl();
+
+        // Read slider offsets
+        float offsetX = offsetXSlider != null ? offsetXSlider.value : 0f;
+        float offsetY = offsetYSlider != null ? offsetYSlider.value : 0f;
+        float offsetZ = offsetZSlider != null ? offsetZSlider.value : 0f;
+        Vector3 offset = new Vector3(offsetX, offsetY, offsetZ);
+
+        // Clear previous
         foreach (var c in cubes)
             Destroy(c);
         cubes.Clear();
@@ -48,7 +72,7 @@ public class SpatialIdVisualizer : MonoBehaviour
                 Vector3 minWorld = SpatialIdToUnityPosition(sid.min_corner);
                 Vector3 maxWorld = SpatialIdToUnityPosition(sid.max_corner);
 
-                Vector3 center = (minWorld + maxWorld) / 2f;
+                Vector3 center = (minWorld + maxWorld) / 2f + offset;
                 Vector3 size = new Vector3(
                     Mathf.Abs(maxWorld.x - minWorld.x),
                     Mathf.Abs(maxWorld.y - minWorld.y),
@@ -58,33 +82,32 @@ public class SpatialIdVisualizer : MonoBehaviour
                 // Box
                 GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 cube.name = $"Box_{detection.name}_zoom{sid.zoom}";
-                cube.transform.position = center;
+                cube.transform.position = center + new Vector3(0,2.36f,0f);
                 cube.transform.localScale = size;
                 cube.GetComponent<MeshRenderer>().material = boxMaterial;
                 cubes.Add(cube);
 
-                // Label Prefab
+                // Label
                 if (labelPrefab != null)
                 {
-                    GameObject label = Instantiate(labelPrefab, center, Quaternion.identity);
+                    GameObject label = Instantiate(labelPrefab, center + new Vector3(0, 2.36f, 0f), Quaternion.identity);
                     label.name = $"Label_{detection.name}_zoom{sid.zoom}";
                     label.transform.LookAt(referencePoint);
-                    cubes.Add(label); // So it also gets cleared on next frame
+                    cubes.Add(label);
 
-                    // Enter second child and modify TextMesh
+                    // Find second child → child → TextMesh
                     if (label.transform.childCount >= 2)
                     {
                         Transform secondChild = label.transform.GetChild(1);
                         TextMesh textMesh = secondChild.GetComponentInChildren<TextMesh>();
-
                         if (textMesh != null)
                             textMesh.text = detection.name;
                         else
-                            Debug.LogWarning("TextMesh not found in second child of label prefab.");
+                            Debug.LogWarning("TextMesh not found in label.");
                     }
                     else
                     {
-                        Debug.LogWarning("Label prefab must have at least two children.");
+                        Debug.LogWarning("Label prefab must have at least 2 children.");
                     }
                 }
             }
@@ -105,7 +128,6 @@ public class SpatialIdVisualizer : MonoBehaviour
                 if (dist < minDistance)
                     minDistance = dist;
             }
-
             distanceText.text = $"Closest box: {minDistance:F2}m";
         }
     }
@@ -135,5 +157,54 @@ public class SpatialIdVisualizer : MonoBehaviour
 
         double3 unityPos = geoReference.TransformEarthCenteredEarthFixedPositionToUnity(ecef);
         return new Vector3((float)unityPos.x, (float)unityPos.y, (float)unityPos.z);
+    }
+
+    void HandleSliderControl()
+    {
+        if (Time.time - lastSwitchTime > sliderCooldown)
+        {
+            if (Gamepad.current != null)
+            {
+                if (Gamepad.current.buttonEast.wasPressedThisFrame) // B
+                {
+                    selectedSlider = OffsetSliderTarget.X;
+                    lastSwitchTime = Time.time;
+                }
+                else if (Gamepad.current.buttonWest.wasPressedThisFrame) // X
+                {
+                    selectedSlider = OffsetSliderTarget.Y;
+                    lastSwitchTime = Time.time;
+                }
+                else if (Gamepad.current.buttonNorth.wasPressedThisFrame) // Y
+                {
+                    selectedSlider = OffsetSliderTarget.Z;
+                    lastSwitchTime = Time.time;
+                }
+            }
+        }
+
+        if (Gamepad.current != null)
+        {
+            float horizontal = Gamepad.current.leftStick.x.ReadValue();
+            if (Mathf.Abs(horizontal) > stickDeadZone)
+            {
+                float delta = horizontal * sliderStep * Time.deltaTime * 60f;
+                switch (selectedSlider)
+                {
+                    case OffsetSliderTarget.X:
+                        if (offsetXSlider != null)
+                            offsetXSlider.value += delta;
+                        break;
+                    case OffsetSliderTarget.Y:
+                        if (offsetYSlider != null)
+                            offsetYSlider.value += delta;
+                        break;
+                    case OffsetSliderTarget.Z:
+                        if (offsetZSlider != null)
+                            offsetZSlider.value += delta;
+                        break;
+                }
+            }
+        }
     }
 }
