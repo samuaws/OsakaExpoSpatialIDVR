@@ -16,6 +16,8 @@ public class AprilTagGeoreferenceAligner : MonoBehaviour
     [Tooltip("Height in meters above WGS84 ellipsoid")]
     public double height = 20.0;
 
+    public Vector3 tagOffset = Vector3.zero;
+
     void Start()
     {
         if (geoReference == null)
@@ -44,12 +46,12 @@ public class AprilTagGeoreferenceAligner : MonoBehaviour
             (float)unityPos.y,
             (float)unityPos.z);
 
-        Vector3 offset = tagPose.position - cesiumUnityPos;
+        tagOffset = tagPose.position - cesiumUnityPos;
 
         // 4. Apply the offset to move Cesium's content into alignment
-        geoReference.transform.position += offset;
+        geoReference.transform.position += tagOffset;
         geoReference.transform.rotation = tagPose.rotation;
 
-        Debug.Log($"[Cesium] Aligned georeference to AprilTag. Offset: {offset}");
+        Debug.Log($"[Cesium] Aligned georeference to AprilTag. Offset: {tagOffset}");
     }
 }

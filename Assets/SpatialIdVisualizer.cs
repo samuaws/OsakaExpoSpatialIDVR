@@ -11,7 +11,9 @@ public class SpatialIdVisualizer : MonoBehaviour
 {
     [Header("References")]
     public CesiumGeoreference geoReference;
-    public Material boxMaterial;
+    public Material boxMaterial; // Default material
+    public Material personMaterial;
+    public Material chairMaterial;
     public GameObject labelPrefab;
     public TextMeshProUGUI distanceText;
 
@@ -46,16 +48,13 @@ public class SpatialIdVisualizer : MonoBehaviour
         if (geoReference == null || NoderedConnector.detections == null)
             return;
 
-        // Handle controller input for sliders
         HandleSliderControl();
 
-        // Read slider offsets
         float offsetX = offsetXSlider != null ? offsetXSlider.value : 0f;
         float offsetY = offsetYSlider != null ? offsetYSlider.value : 0f;
         float offsetZ = offsetZSlider != null ? offsetZSlider.value : 0f;
         Vector3 offset = new Vector3(offsetX, offsetY, offsetZ);
 
-        // Clear previous
         foreach (var c in cubes)
             Destroy(c);
         cubes.Clear();
@@ -63,6 +62,7 @@ public class SpatialIdVisualizer : MonoBehaviour
         foreach (var detection in NoderedConnector.detections)
         {
             if (detection.spatial_ids == null) continue;
+            //if(!GameManager.Instance.anchorLocalised) continue;
 
             foreach (var sid in detection.spatial_ids)
             {
@@ -82,20 +82,34 @@ public class SpatialIdVisualizer : MonoBehaviour
                 // Box
                 GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 cube.name = $"Box_{detection.name}_zoom{sid.zoom}";
-                cube.transform.position = center + new Vector3(0,2.36f,0f);
+                cube.transform.position = center + new Vector3(0, 2f, 0f) + GameManager.Instance.aprilTagGeoreferenceAligner.tagOffset;
                 cube.transform.localScale = size;
-                cube.GetComponent<MeshRenderer>().material = boxMaterial;
+
+                // Select material
+                Material selectedMaterial = boxMaterial;
+                string nameLower = detection.name.ToLower();
+                if (nameLower.Contains("chair") && chairMaterial != null)
+                    selectedMaterial = chairMaterial;
+                else if (nameLower.Contains("person") && personMaterial != null)
+                    selectedMaterial = personMaterial;
+
+                if (selectedMaterial == null)
+                {
+                    Debug.LogWarning($"Material for '{detection.name}' is not assigned. Using default boxMaterial.");
+                    selectedMaterial = boxMaterial;
+                }
+
+                cube.GetComponent<MeshRenderer>().material = selectedMaterial;
                 cubes.Add(cube);
 
                 // Label
                 if (labelPrefab != null)
                 {
-                    GameObject label = Instantiate(labelPrefab, center + new Vector3(0, 2.36f, 0f), Quaternion.identity);
+                    GameObject label = Instantiate(labelPrefab, center + new Vector3(0, 2f, 0f) + GameManager.Instance.aprilTagGeoreferenceAligner.tagOffset, Quaternion.identity);
                     label.name = $"Label_{detection.name}_zoom{sid.zoom}";
                     label.transform.LookAt(referencePoint);
                     cubes.Add(label);
 
-                    // Find second child → child → TextMesh
                     if (label.transform.childCount >= 2)
                     {
                         Transform secondChild = label.transform.GetChild(1);
