@@ -21,6 +21,8 @@ public class StickSelector : MonoBehaviour
     private List<Collider> overlappingCells = new List<Collider>();
     private List<GameObject> selectedCells = new List<GameObject>();
 
+    public Collider currentHoverCell; // Only one hover at a time
+
     void Update()
     {
         // Adjust stick length with joystick
@@ -30,14 +32,17 @@ public class StickSelector : MonoBehaviour
 
         // Move cursor
         cursor.position = controllerTransform.position + controllerTransform.forward * stickLength;
+        cursor.rotation = controllerTransform.rotation;
 
-        // On trigger press select first overlapping cell
+        // Update hover (choose first in overlapping list)
+        UpdateHoverCell();
+
+        // On trigger press select current hover cell
         if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger))
         {
-            if (overlappingCells.Count > 0)
+            if (currentHoverCell != null)
             {
-                Collider selected = overlappingCells[0];
-                Transform child = selected.transform.GetChild(0); // assume first child is the visual
+                Transform child = currentHoverCell.transform.GetChild(0); // assume first child is the visual
                 Renderer rend = child.GetComponent<Renderer>();
 
                 if (rend)
@@ -45,11 +50,32 @@ public class StickSelector : MonoBehaviour
                     rend.material = selectedMaterial;
                 }
 
-                if (!selectedCells.Contains(selected.gameObject))
-                    selectedCells.Add(selected.gameObject);
+                if (!selectedCells.Contains(currentHoverCell.gameObject))
+                    selectedCells.Add(currentHoverCell.gameObject);
 
-                Debug.Log("Cell selected: " + selected.gameObject.name);
+                Debug.Log("Cell selected: " + currentHoverCell.gameObject.name);
             }
+        }
+    }
+
+    private void UpdateHoverCell()
+    {
+        // Clear old hover
+        if (currentHoverCell != null && !selectedCells.Contains(currentHoverCell.gameObject))
+        {
+            Transform child = currentHoverCell.transform.GetChild(0);
+            Renderer rend = child.GetComponent<Renderer>();
+            if (rend) rend.material = transparentMaterial;
+        }
+
+        // Pick new hover
+        currentHoverCell = overlappingCells.Count > 0 ? overlappingCells[0] : null;
+
+        if (currentHoverCell != null && !selectedCells.Contains(currentHoverCell.gameObject))
+        {
+            Transform child = currentHoverCell.transform.GetChild(0);
+            Renderer rend = child.GetComponent<Renderer>();
+            if (rend) rend.material = selectableMaterial;
         }
     }
 
@@ -58,14 +84,7 @@ public class StickSelector : MonoBehaviour
         if (!overlappingCells.Contains(other))
         {
             overlappingCells.Add(other);
-
-            // Change child material to selectable
-            Transform child = other.transform.GetChild(0);
-            Renderer rend = child.GetComponent<Renderer>();
-            if (rend && !selectedCells.Contains(other.gameObject)) // only if not already selected
-            {
-                rend.material = selectableMaterial;
-            }
+            UpdateHoverCell();
         }
     }
 
@@ -75,13 +94,15 @@ public class StickSelector : MonoBehaviour
         {
             overlappingCells.Remove(other);
 
-            // Reset to transparent if not selected
-            Transform child = other.transform.GetChild(0);
-            Renderer rend = child.GetComponent<Renderer>();
-            if (rend && !selectedCells.Contains(other.gameObject))
+            // Reset material if not selected
+            if (!selectedCells.Contains(other.gameObject))
             {
-                rend.material = transparentMaterial;
+                Transform child = other.transform.GetChild(0);
+                Renderer rend = child.GetComponent<Renderer>();
+                if (rend) rend.material = transparentMaterial;
             }
+
+            UpdateHoverCell();
         }
     }
 }
