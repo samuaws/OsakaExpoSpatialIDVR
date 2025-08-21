@@ -16,6 +16,7 @@ public class SpatialIdVisualizer : MonoBehaviour
     public Material chairMaterial;
     public GameObject labelPrefab;
     public TextMeshProUGUI distanceText;
+    public TextMeshProUGUI tagOffest;
 
     [Header("UI Sliders")]
     public Slider offsetXSlider;
@@ -48,6 +49,7 @@ public class SpatialIdVisualizer : MonoBehaviour
         if (geoReference == null || NoderedConnector.detections == null)
             return;
 
+        tagOffest.text = GameManager.Instance.aprilTagGeoreferenceAligner.tagOffset.ToString();
         HandleSliderControl();
 
         float offsetX = offsetXSlider != null ? offsetXSlider.value : 0f;
