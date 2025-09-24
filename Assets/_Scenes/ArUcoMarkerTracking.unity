@@ -2046,6 +2046,7 @@ MonoBehaviour:
   arucoCoordinator: {fileID: 336067257}
   unityPosText: {fileID: 0}
   aprilTagGeoreferenceAligner: {fileID: 358949064}
+  gridSpawner: {fileID: 0}
   anchorLocalised: 0
 --- !u!4 &358949062
 Transform:
@@ -2109,7 +2110,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3aa8ac49f3251414a967da4ab2b277b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  url: 'wss://nodered.tlab.cloud/unity '
+  url: wss://nodered.tlab.cloud/osaka
   Connect: 1
 --- !u!114 &358949066
 MonoBehaviour:
@@ -2132,7 +2133,7 @@ MonoBehaviour:
   offsetXSlider: {fileID: 540552117}
   offsetYSlider: {fileID: 1614713897}
   offsetZSlider: {fileID: 159325219}
-  targetZoomLevel: 25
+  targetZoomLevel: 28
 --- !u!114 &358949067
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2146,7 +2147,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefab: {fileID: 7214375438695188263, guid: cf6f2f56ae3c3fe4f86aa5230ba2e92a, type: 3}
-  boundingBoxSize: {x: 5.71, y: 6.09, z: 5.76}
+  gridSize: {x: 8, y: 6, z: 7}
   prefabSize: {x: 1, y: 1, z: 1}
   gridParent: {fileID: 28437309}
 --- !u!1 &363842719

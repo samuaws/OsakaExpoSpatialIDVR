@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     public ArUcoTrackingAppCoordinator arucoCoordinator;
     public TextMeshProUGUI unityPosText;
     public AprilTagGeoreferenceAligner aprilTagGeoreferenceAligner;
+    public GridSpawner gridSpawner;
     public bool anchorLocalised = false;
 
     private bool aButtonWasPressed = false;
@@ -99,6 +100,8 @@ public class GameManager : MonoBehaviour
 
                     // Align Cesium after anchor is created
                     aprilTagGeoreferenceAligner.AlignCesiumToAprilTag(savedTagPose);
+                    //gridSpawner.GenerateGridFromFirstSpatialId();
+                    
                 }
                 else
                 {
