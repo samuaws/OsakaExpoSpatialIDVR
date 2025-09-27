@@ -1,7 +1,10 @@
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.Networking;
 using System.Collections;
+using Newtonsoft.Json;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 
 public class StickSelector : MonoBehaviour
 {
@@ -20,41 +23,82 @@ public class StickSelector : MonoBehaviour
     public Material selectedMaterial;
 
     [Header("API Settings")]
-    public string apiBaseUrl = "http://localhost:5000/api/attributes/";
+    public string apiBaseUrl = "http://157.82.204.226:5000/api/attributes/";
     public int zoomLevel = 25;
 
-    // Track overlapping cells
     private List<Collider> overlappingCells = new List<Collider>();
     private List<GameObject> selectedCells = new List<GameObject>();
 
-    public Collider currentHoverCell; // Only one hover at a time
+    public Collider currentHoverCell;
+
+    private static readonly HttpClient httpClient = new HttpClient();
+
+    public void SendTestRequestFromButton()
+    {
+        _ = SendTestRequestAsync();
+    }
+
+    private async Task SendTestRequestAsync()
+    {
+        string testSpatialId = "25/29/29801115/13210757"; // Replace with a real one
+        string url = apiBaseUrl + testSpatialId;
+
+        Debug.Log("Sending test request to: " + url);
+
+        var payload = new Payload
+        {
+            zoom_level = zoomLevel,
+            attributes = new Dictionary<string, object>
+            {
+                { "selected", true },
+                { "source", "unity_test_button" }
+            }
+        };
+
+        string jsonData = JsonConvert.SerializeObject(payload);
+        var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+        try
+        {
+            HttpResponseMessage response = await httpClient.PostAsync(url, content);
+            string responseText = await response.Content.ReadAsStringAsync();
+
+            if (response.IsSuccessStatusCode)
+            {
+                Debug.Log("Test request success: " + responseText);
+            }
+            else
+            {
+                Debug.LogError($"Test request failed ({response.StatusCode}): {responseText}");
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError("Test request exception: " + ex.Message);
+        }
+    }
 
     void Update()
     {
-        // Adjust stick length with joystick
+        // Adjust stick length
         Vector2 input = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
         stickLength += input.y * adjustSpeed * Time.deltaTime;
         stickLength = Mathf.Clamp(stickLength, minLength, maxLength);
 
-        // Move cursor
+        // Cursor follows controller
         cursor.position = controllerTransform.position + controllerTransform.forward * stickLength;
         cursor.rotation = controllerTransform.rotation;
 
-        // Update hover (choose first in overlapping list)
         UpdateHoverCell();
 
-        // On trigger press select current hover cell
+        // Select on trigger
         if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger))
         {
             if (currentHoverCell != null)
             {
-                Transform child = currentHoverCell.transform.GetChild(0); // assume first child is the visual
+                Transform child = currentHoverCell.transform.GetChild(0);
                 Renderer rend = child.GetComponent<Renderer>();
-
-                if (rend)
-                {
-                    rend.material = selectedMaterial;
-                }
+                if (rend) rend.material = selectedMaterial;
 
                 if (!selectedCells.Contains(currentHoverCell.gameObject))
                     selectedCells.Add(currentHoverCell.gameObject);
@@ -63,8 +107,8 @@ public class StickSelector : MonoBehaviour
             }
         }
 
-        // Left controller button -> send to API
-        if (OVRInput.GetDown(OVRInput.Button.Three)) // "X" button on left controller
+        // Send to API
+        if (OVRInput.GetDown(OVRInput.Button.Three)) // "X" button
         {
             SaveSelectedCells();
         }
@@ -72,7 +116,6 @@ public class StickSelector : MonoBehaviour
 
     private void UpdateHoverCell()
     {
-        // Clear old hover
         if (currentHoverCell != null && !selectedCells.Contains(currentHoverCell.gameObject))
         {
             Transform child = currentHoverCell.transform.GetChild(0);
@@ -80,7 +123,6 @@ public class StickSelector : MonoBehaviour
             if (rend) rend.material = transparentMaterial;
         }
 
-        // Pick new hover
         currentHoverCell = overlappingCells.Count > 0 ? overlappingCells[0] : null;
 
         if (currentHoverCell != null && !selectedCells.Contains(currentHoverCell.gameObject))
@@ -106,7 +148,6 @@ public class StickSelector : MonoBehaviour
         {
             overlappingCells.Remove(other);
 
-            // Reset material if not selected
             if (!selectedCells.Contains(other.gameObject))
             {
                 Transform child = other.transform.GetChild(0);
@@ -121,24 +162,23 @@ public class StickSelector : MonoBehaviour
     private void SaveSelectedCells()
     {
         Debug.Log("Saving selected cells to API...");
-        foreach (GameObject cell in new List<GameObject>(selectedCells)) // copy to avoid modifying list while iterating
+        foreach (GameObject cell in new List<GameObject>(selectedCells))
         {
             SpatialIdCell idCell = cell.GetComponent<SpatialIdCell>();
             if (idCell != null)
             {
                 string spatialId = idCell.spatialId;
-                StartCoroutine(SendPostRequest(spatialId, cell));
+                _ = SendPostRequestAsync(spatialId, cell);
             }
         }
     }
 
-    private IEnumerator SendPostRequest(string spatialId, GameObject cell)
+    private async Task SendPostRequestAsync(string spatialId, GameObject cell)
     {
         string url = apiBaseUrl + spatialId;
         Debug.Log("Posting to " + url);
 
-        // Example attributes you want to save (customize this!)
-        var payload = new
+        var payload = new Payload
         {
             zoom_level = zoomLevel,
             attributes = new Dictionary<string, object>
@@ -147,57 +187,33 @@ public class StickSelector : MonoBehaviour
             }
         };
 
-        string jsonData = JsonUtility.ToJson(new Wrapper(payload));
+        string jsonData = JsonConvert.SerializeObject(payload);
+        var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
 
-        using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
+        try
         {
-            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
-            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.SetRequestHeader("Content-Type", "application/json");
+            HttpResponseMessage response = await httpClient.PostAsync(url, content);
+            string responseText = await response.Content.ReadAsStringAsync();
 
-            yield return request.SendWebRequest();
-
-            if (request.result == UnityWebRequest.Result.Success)
+            if (response.IsSuccessStatusCode)
             {
                 Debug.Log("Successfully saved SpatialID " + spatialId);
-                selectedCells.Remove(cell); // remove from temp list -> stays visually selected
+                selectedCells.Remove(cell);
             }
             else
             {
-                Debug.LogError("Error saving SpatialID " + spatialId + ": " + request.error);
+                Debug.LogError($"Error saving SpatialID {spatialId}: {response.StatusCode} {responseText}");
             }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError("Post request exception: " + ex.Message);
         }
     }
 
-    // Helper to wrap dictionary since JsonUtility does not support it directly
-    [System.Serializable]
-    private class Wrapper
+    private class Payload
     {
         public int zoom_level;
-        public SerializableDict attributes;
-
-        public Wrapper(object data)
-        {
-            var dict = (Dictionary<string, object>)((dynamic)data).attributes;
-            zoom_level = ((dynamic)data).zoom_level;
-            attributes = new SerializableDict(dict);
-        }
-    }
-
-    [System.Serializable]
-    private class SerializableDict
-    {
-        public List<string> keys = new List<string>();
-        public List<string> values = new List<string>();
-
-        public SerializableDict(Dictionary<string, object> dict)
-        {
-            foreach (var kvp in dict)
-            {
-                keys.Add(kvp.Key);
-                values.Add(kvp.Value.ToString());
-            }
-        }
+        public Dictionary<string, object> attributes;
     }
 }
