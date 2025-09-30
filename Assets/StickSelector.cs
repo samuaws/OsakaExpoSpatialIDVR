@@ -22,6 +22,9 @@ public class StickSelector : MonoBehaviour
     public Material selectableMaterial;
     public Material selectedMaterial;
 
+    [Header("Label Settings")]
+    public GameObject labelPrefab;
+
     [Header("API Settings")]
     public string apiBaseUrl = "http://157.82.204.226:5000/api/attributes/";
     public int zoomLevel = 25;
@@ -80,8 +83,8 @@ public class StickSelector : MonoBehaviour
 
     void Update()
     {
-        // Adjust stick length
-        Vector2 input = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
+        //  Right thumbstick controls stick length
+        Vector2 input = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
         stickLength += input.y * adjustSpeed * Time.deltaTime;
         stickLength = Mathf.Clamp(stickLength, minLength, maxLength);
 
@@ -91,8 +94,8 @@ public class StickSelector : MonoBehaviour
 
         UpdateHoverCell();
 
-        // Select on trigger
-        if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger))
+        //  Right trigger selects
+        if (OVRInput.GetDown(OVRInput.Button.SecondaryIndexTrigger))
         {
             if (currentHoverCell != null)
             {
@@ -101,13 +104,16 @@ public class StickSelector : MonoBehaviour
                 if (rend) rend.material = selectedMaterial;
 
                 if (!selectedCells.Contains(currentHoverCell.gameObject))
+                {
                     selectedCells.Add(currentHoverCell.gameObject);
+                    CreateLabel(currentHoverCell.transform);
+                }
 
                 Debug.Log("Cell selected: " + currentHoverCell.gameObject.name);
             }
         }
 
-        // Send to API
+        // Send to API (still bound to "X" button on left controller unless you want it moved?)
         if (OVRInput.GetDown(OVRInput.Button.Three)) // "X" button
         {
             SaveSelectedCells();
@@ -208,6 +214,24 @@ public class StickSelector : MonoBehaviour
         catch (System.Exception ex)
         {
             Debug.LogError("Post request exception: " + ex.Message);
+        }
+    }
+
+    private void CreateLabel(Transform cell)
+    {
+        if (labelPrefab == null) return;
+
+        Vector3 labelPos = cell.position + Vector3.up * 2f;
+        GameObject label = Instantiate(labelPrefab, labelPos, Quaternion.identity);
+        label.transform.LookAt(Camera.main.transform);
+        label.name = "Label_" + cell.gameObject.name;
+
+        if (label.transform.childCount >= 2)
+        {
+            Transform secondChild = label.transform.GetChild(1);
+            TextMesh textMesh = secondChild.GetComponentInChildren<TextMesh>();
+            if (textMesh != null)
+                textMesh.text = "Under Construction";
         }
     }
 

@@ -8493,6 +8493,7 @@ MonoBehaviour:
   transparentMaterial: {fileID: 2100000, guid: adb778388b46c6f4b8a8a6097760cc36, type: 2}
   selectableMaterial: {fileID: 2100000, guid: 6f1512346313bd8429890e8df0bc69d0, type: 2}
   selectedMaterial: {fileID: 2100000, guid: 68598fec367ad2a43b0fe84b7a0abb99, type: 2}
+  labelPrefab: {fileID: 5080873394910436345, guid: cf85dc985a97686419163a139cfb369d, type: 3}
   apiBaseUrl: http://157.82.204.226:5000/api/attributes/
   zoomLevel: 25
   currentHoverCell: {fileID: 0}
