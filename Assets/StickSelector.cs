@@ -221,7 +221,7 @@ public class StickSelector : MonoBehaviour
     {
         if (labelPrefab == null) return;
 
-        Vector3 labelPos = cell.position + Vector3.up * 2f;
+        Vector3 labelPos = cell.position;
         GameObject label = Instantiate(labelPrefab, labelPos, Quaternion.identity);
         label.transform.LookAt(Camera.main.transform);
         label.name = "Label_" + cell.gameObject.name;
